@@ -1,7 +1,7 @@
 FROM php:8.0-cli as base
 
-ENV PROTO_VER 22.2
-ENV GRPC_VER v1.53.0
+ENV PROTO_VER 3.12.2
+ENV GRPC_VER v1.30.0
 
 RUN apt update && apt install -y \
     cmake \
@@ -40,6 +40,8 @@ COPY --from=base /tmp/protoc/bin/* /usr/local/bin/
 COPY --from=base /tmp/protoc/include/* /usr/local/include/
 COPY --from=base /var/local/grpc/cmake/build/grpc_php_plugin /usr/local/bin/
 
+RUN chmod 777 /usr/local/bin/protoc
+
 USER $USERNAME
 
-ENTRYPOINT ["protoc", "--proto_path=/var/local/protos", "--php_out=/var/local/gen", "--plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin"]
+ENTRYPOINT ["protoc", "--proto_path=/var/local/protos", "--php_out=/var/local/gen", "--grpc_out=/var/local/gen", "--plugin=protoc-gen-grpc=/usr/local/bin/grpc_php_plugin"]
